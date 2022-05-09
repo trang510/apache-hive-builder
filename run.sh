@@ -8,3 +8,4 @@ fi;
 
 hiveserver2 --service metastore &
 hiveserver2
+
