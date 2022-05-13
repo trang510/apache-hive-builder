@@ -30,6 +30,6 @@ ENV HIVE_HOME /opt/app/apache-hive-${HIVE_VERSION}-bin
 ENV PATH $HADOOP_HOME/bin:$HIVE_HOME/bin:$JAVA_HOME/bin:$PATH
 
 
-WORKDIR /opt/app
+WORKDIR /opt/app/work
 COPY run.sh /opt/app/hive-start.sh
 CMD ["/opt/app/hive-start.sh"]
