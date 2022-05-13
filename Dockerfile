@@ -29,7 +29,13 @@ ENV HADOOP_HOME /opt/app/hadoop-${HADOOP_VERSION}
 ENV HIVE_HOME /opt/app/apache-hive-${HIVE_VERSION}-bin
 ENV PATH $HADOOP_HOME/bin:$HIVE_HOME/bin:$JAVA_HOME/bin:$PATH
 
+RUN addgroup --gid 1000 app && adduser --system --gid 1000 --uid 1000 app
 
 WORKDIR /opt/app/work
 COPY run.sh /opt/app/hive-start.sh
+
+RUN chown -R app:app /opt/app
+USER app
+
 CMD ["/opt/app/hive-start.sh"]
+
