@@ -1,41 +1,23 @@
 FROM ubuntu:latest
-ARG HIVE_VERSION="3.1.3"
-ARG HADOOP_VERSION="3.3.2"
-ENV HIVE_VERSION=${HIVE_VERSION}
-ENV HADOOP_VERSION=${HADOOP_VERSION}
+ARG HIVE_BIN_VERSION="3.1.3"
+ARG HADOOP_BIN_VERSION="3.3.5"
+ENV HIVE_BIN_VERSION=${HIVE_BIN_VERSION}
+ENV HADOOP_BIN_VERSION=${HADOOP_BIN_VERSION}
 
-RUN apt-get update && echo y | apt-get install openjdk-8-jdk curl
+RUN apt-get update && apt-get install -y openjdk-8-jdk curl
 RUN mkdir /opt/app && mkdir /opt/app/work
 
-#Offline 
-#COPY apache-hive-${HIVE_VERSION}-bin.tar.gz /opt/app/apache-hive-${HIVE_VERSION}-bin.tar.gz
-#COPY hadoop-${HADOOP_VERSION}.tar.gz /opt/app/hadoop-${HADOOP_VERSION}.tar.gz
+COPY hive/ /tmp/hive/
 
-#Online
-RUN curl -o /opt/app/apache-hive-${HIVE_VERSION}-bin.tar.gz https://downloads.apache.org/hive/hive-${HIVE_VERSION}/apache-hive-${HIVE_VERSION}-bin.tar.gz
-RUN curl -o /opt/app/hadoop-${HADOOP_VERSION}.tar.gz https://archive.apache.org/dist/hadoop/core/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz
-
-RUN tar zxf /opt/app/apache-hive-${HIVE_VERSION}-bin.tar.gz -C /opt/app && \
-    tar zxf /opt/app/hadoop-${HADOOP_VERSION}.tar.gz -C /opt/app
-RUN rm /opt/app/apache-hive-${HIVE_VERSION}-bin/lib/guava-19.0.jar && \
-    cp /opt/app/hadoop-${HADOOP_VERSION}/share/hadoop/hdfs/lib/guava-27.0-jre.jar /opt/app/apache-hive-${HIVE_VERSION}-bin/lib/ && \
-    cp /opt/app/hadoop-${HADOOP_VERSION}/share/hadoop/tools/lib/hadoop-aws-${HADOOP_VERSION}.jar /opt/app/apache-hive-${HIVE_VERSION}-bin/lib/ && \
-    cp /opt/app/hadoop-${HADOOP_VERSION}/share/hadoop/tools/lib/aws-java-sdk-bundle-*.jar /opt/app/apache-hive-${HIVE_VERSION}-bin/lib/ && \
-    rm /opt/app/*.gz
-RUN echo y|apt-get remove curl
+RUN /tmp/hive/setup.sh
+COPY build/libs/hive-authz.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/hive-authz.jar
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-ENV HADOOP_HOME /opt/app/hadoop-${HADOOP_VERSION}
-ENV HIVE_HOME /opt/app/apache-hive-${HIVE_VERSION}-bin
+ENV HADOOP_HOME /opt/app/hadoop-${HADOOP_BIN_VERSION}
+ENV HIVE_HOME /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin
 ENV PATH $HADOOP_HOME/bin:$HIVE_HOME/bin:$JAVA_HOME/bin:$PATH
 
-RUN addgroup --gid 1000 app && adduser --system --gid 1000 --uid 1000 app
-
 WORKDIR /opt/app/work
-COPY run.sh /opt/app/hive-start.sh
-
-RUN chown -R app:app /opt/app
-USER app
-
-CMD ["/opt/app/hive-start.sh"]
+COPY hive/run.sh /opt/app/work/hive-start.sh
+CMD ["./hive-start.sh"]
 

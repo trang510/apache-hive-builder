@@ -41,7 +41,7 @@ all() {
     local image_version_tag="${owner}/${project}:${hive_version}-${version}"
     local image_latest_tag="${owner}/${project}:latest"
     echo building ${image_version_tag}
-    docker build --no-cache -t ${image_version_tag} --build-arg HIVE_VERSION=${hive_version} --build-arg HADOOP_VERSION=${hadoop_version} .
+    docker build --no-cache -t ${image_version_tag} --build-arg HIVE_BIN_VERSION=${hive_version} --build-arg HADOOP_BIN_VERSION=${hadoop_version} .
     docker push ${image_version_tag}
     docker tag ${image_version_tag} ${image_latest_tag}
     docker push ${image_latest_tag}
@@ -59,7 +59,7 @@ all() {
 _latest() {
   source project.properties
   local image_latest_tag="${owner}/${project}:latest"
-  docker build --no-cache -t ${image_latest_tag} --build-arg HIVE_VERSION=${hive_version} --build-arg HADOOP_VERSION=${hadoop_version} .
+  docker build --no-cache -t ${image_latest_tag} --build-arg HIVE_BIN_VERSION=${hive_version} --build-arg HADOOP_BIN_VERSION=${hadoop_version} .
   docker push ${image_latest_tag}
 }
 
