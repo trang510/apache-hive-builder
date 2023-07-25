@@ -47,7 +47,19 @@ clean_unused_files() {
   done;
 }
 
-clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib
-clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib
-clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib
+for fd in hcatalog/share/webhcat hcatalog/share/webhcat/svr/lib jdbc lib hcatalog/share/webhcat/java-client;
+do
+  clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd}
+done;
+
+for fd in share/hadoop/tools/sources share/hadoop/yarn/sources share/hadoop/hdfs/sources share/hadoop/mapreduce/sources;
+do
+  rm -rf /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd}
+done;
+
+
+for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
+do
+  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd}
+done;
 
