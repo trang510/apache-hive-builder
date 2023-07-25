@@ -22,3 +22,32 @@ tar zxf /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz -C /opt/app && \
     cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.316.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
     rm /tmp/hive/*.gz && rm -rf /tmp/hive/output && rm -rf /tmp/hive/data
 
+clean_unused_files() {
+  local target=$1
+  local n=0
+  local cleaned=0
+  for jf in $(ls $target);
+  do
+    cleaned=0
+    for pom in $(jar tvf $target/$jf|grep -E "pom.(xml|properties)$"|awk -F" " '{print $8}');
+    do
+      zip -d $target/$jf $pom
+      cleaned=1
+    done;
+    if [[ $cleaned -eq 1 ]] || [[ $jf =~ ^[a-z]+.*$ ]];
+    then
+      ok=1
+      echo $(date) $jf > RELEASE
+      zip -u $target/$jf RELEASE
+      if [[ "$mode" == "1" ]]; then
+        mv $target/$jf $target/lib-$n.jar
+      fi;
+    fi;
+    n=$((n+1))
+  done;
+}
+
+clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib
+clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib
+clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib
+
