@@ -4,7 +4,7 @@ ARG HADOOP_BIN_VERSION="3.3.5"
 ENV HIVE_BIN_VERSION=${HIVE_BIN_VERSION}
 ENV HADOOP_BIN_VERSION=${HADOOP_BIN_VERSION}
 
-RUN apt-get update && apt-get install -y openjdk-8-jdk curl
+RUN apt-get update && apt-get install -y openjdk-8-jdk curl zip
 RUN mkdir /opt/app && mkdir /opt/app/work
 
 COPY hive/ /tmp/hive/
