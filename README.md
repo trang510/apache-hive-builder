@@ -16,20 +16,26 @@ graph LR;
   build -.cloudnativek8s.-> dockerhub(Docker Hub Push)
   golden(GV Onboarding URL) -.1. retrieve cloudnativek8s image .-> dockerhub
   golden -. 2.evaluate Vulnerabilities .-> aqua(Aqua)
-  aqua -.1a. has vulnerabilities .-> artifactory_stag(gv-images-products_stage/oss)
+  aqua -.1a. has vulnerabilities .-> artifactory_stg(gv-images-products_stage/oss)
   aqua -.1b. has no vulnerabilities .-> artifactory_clean(gv-images-products/oss)
   
   eng(Enterprise Engineer) --> golden
   eng -. 1. pushes build instructions .-> vendor($team-vendor-images/images.txt)
 
-  jenkins(Jenkins Image Onboarding) --> vendor
+  jenkins(Team Image Onboarding) --> vendor
   jenkins -. 1. if clean .-> artifactory_clean
   jenkins --> artifactory(cache.artifactory../$team-third-party/)
   pss(Prod Support) --> ptp(Promote to Prod)
-  ptp --> artifactory_prod(production-cache.artifactory...)
+  ptp -. 1. download and tag .-> artifactory
+  ptp -. 2. tag and push .-> artifactory_prod(production-cache.artifactory...)
 
 
-
+  classDef yellow fill:#fea,stroke:#333,color:#444,stroke-width:1px
+  classDef green fill:#0f2,stroke:#0f2,color:#444,stroke-width:1px
+  classDef pink fill:#e4a,stroke:#e4a,color:#444,stroke-width:1px
+  class eng,golden,aqua,artifactory_stg,artifactory_clean,vendor,jenkins,artifactory yellow
+  class pss,ptp,artifactory_prod pink
+  class makefile,build,github,user,imagemine,docker,project,dockerhub green
 ```
 
 
