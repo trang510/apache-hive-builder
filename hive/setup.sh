@@ -24,6 +24,7 @@ tar zxf /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz -C /opt/app && \
 
 clean_unused_files() {
   local target=$1
+  local mode=$2
   local n=0
   local cleaned=0
   for jf in $(ls $target);
@@ -49,7 +50,7 @@ clean_unused_files() {
 
 for fd in hcatalog/share/webhcat hcatalog/share/webhcat/svr/lib jdbc lib hcatalog/share/webhcat/java-client;
 do
-  clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd}
+  clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd} 1
 done;
 
 for fd in share/hadoop/tools/sources share/hadoop/yarn/sources share/hadoop/hdfs/sources share/hadoop/mapreduce/sources;
@@ -60,6 +61,6 @@ done;
 
 for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
 do
-  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd}
+  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 1
 done;
 
