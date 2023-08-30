@@ -59,6 +59,7 @@ do
   rm -rf /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd}
 done;
 
+rm -rf /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/hadoop-yarn-applications-catalog-webapp-*.war
 
 for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
 do
