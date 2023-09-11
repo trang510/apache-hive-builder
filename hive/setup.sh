@@ -22,6 +22,8 @@ tar zxf /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz -C /opt/app && \
     cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.316.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
     rm /tmp/hive/*.gz && rm -rf /tmp/hive/output && rm -rf /tmp/hive/data
 
+exclude_files=("hive-cli" "hive-exec" "hive-metastore")
+
 clean_unused_files() {
   local target=$1
   local mode=$2
@@ -29,6 +31,11 @@ clean_unused_files() {
   local cleaned=0
   for jf in $(ls $target);
   do
+    
+    if [[ "${exclude_files[@]}" =~ ${jf%%-*} ]]; then
+      continue
+    fi
+
     cleaned=0
     for pom in $(jar tvf $target/$jf|grep -E "pom.(xml|properties)$"|awk -F" " '{print $8}');
     do
@@ -50,8 +57,8 @@ clean_unused_files() {
 
 for fd in hcatalog/share/webhcat hcatalog/share/webhcat/svr/lib jdbc lib hcatalog/share/webhcat/java-client;
 do
-  #clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd} 0
-  echo .
+  clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd} 0
+  # echo .
 done;
 
 for fd in share/hadoop/tools/sources share/hadoop/yarn/sources share/hadoop/hdfs/sources share/hadoop/mapreduce/sources;
@@ -63,7 +70,7 @@ rm -rf /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/hadoop-yarn-appli
 
 for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
 do
-  #clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 0
-  echo .
+  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 0
+  # echo .
 done;
 
