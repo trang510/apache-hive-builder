@@ -19,7 +19,7 @@ tar zxf /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz -C /opt/app && \
     rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/guava-19.0.jar && \
     cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/guava-27.0-jre.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
     cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/hadoop-aws-${HADOOP_BIN_VERSION}.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
-    cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.316.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
+    cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.367.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
     rm /tmp/hive/*.gz && rm -rf /tmp/hive/output && rm -rf /tmp/hive/data
 
 exclude_files=("hive-cli" "hive-exec" "hive-metastore")
