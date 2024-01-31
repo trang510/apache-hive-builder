@@ -10,6 +10,7 @@ RUN mkdir /opt/app && mkdir /opt/app/work
 COPY hive/ /tmp/hive/
 
 RUN /tmp/hive/setup.sh
+
 COPY build/libs/hive-authz.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/hive-authz.jar
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64

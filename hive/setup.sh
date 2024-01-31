@@ -5,6 +5,45 @@ if [[ -z ${HIVE_BIN_VERSION} ]] || [[ -z $HADOOP_BIN_VERSION ]]; then
   exit 1;
 fi;
 
+extra_libs() {
+  local target=$1
+  local lib_file="/tmp/hive/extra-libs.properties"
+  for line in $(cat ${lib_file})
+  do
+    echo $line
+    fname=$(basename $line)
+    patt="^"$(echo $fname | sed -E "s/[0-9]+\.[0-9]+\.[0-9]+/[0-9]+\.[0-9]+\.[0-9]+/g")"$"
+    set +e
+    matching_file=$(ls $target | grep -E $patt | head -1)
+    if [[ $matching_file != "" ]]; then
+      echo "Removing old version ${matching_file} and replacing with ${fname}"
+      rm $target/$matching_file
+    fi
+    set -e
+    curl -sL -o ${target}/${fname} ${line}
+  done
+}
+
+# Function to remove specified libraries
+remove_libs() {
+  local target=$1
+  local lib_file="/tmp/hive/delete-libs.properties"
+  for line in $(cat ${lib_file})
+  do
+    for jf in $(ls $target)
+    do
+      if [[ -d $target/$jf ]]; then
+        remove_libs $target/$jf
+      else
+        if [[ "$jf" == "$line" ]]; then
+          echo "Removing jar $target/$jf"
+          rm $target/$jf
+        fi
+      fi
+    done
+  done
+}
+
 if [[ ! -f /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz ]];
 then
   curl -o /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz https://downloads.apache.org/hive/hive-${HIVE_BIN_VERSION}/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz
@@ -15,9 +54,11 @@ then
 fi;
 
 tar zxf /tmp/hive/apache-hive-${HIVE_BIN_VERSION}-bin.tar.gz -C /opt/app && \
-    tar zxf /tmp/hive/hadoop-${HADOOP_BIN_VERSION}.tar.gz -C /opt/app && \
-    rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/guava-19.0.jar && \
-    cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/guava-27.0-jre.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
+    tar zxf /tmp/hive/hadoop-${HADOOP_BIN_VERSION}.tar.gz -C /opt/app
+
+extra_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/" 
+remove_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/"
+
     cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/hadoop-aws-${HADOOP_BIN_VERSION}.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
     cp /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/tools/lib/aws-java-sdk-bundle-1.12.367.jar /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/ && \
     rm /tmp/hive/*.gz && rm -rf /tmp/hive/output && rm -rf /tmp/hive/data
