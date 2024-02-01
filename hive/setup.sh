@@ -115,8 +115,19 @@ done;
 
 remove_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/"
 remove_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/jdbc/"
-remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/csi/lib/"
-remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/timelineservice/lib/"
+# remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/csi/lib/"
+# remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/timelineservice/lib/"
+rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/timelineservice/lib/htrace-core-3.1.0-incubating.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/velocity-1.7.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/calcite-core-1.16.0.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/calcite-druid-1.16.0.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/avro-1.8.2.jar
+rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/common/lib/avro-1.7.7.jar
+rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/avro-1.7.7.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/hbase-server-2.0.0-alpha4.jar
+rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/csi/lib/protobuf-java-3.7.1.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/netty-3.10.5.Final.jar
+rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/netty-3.10.6.Final.jar
 
 extra_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/" 
 extra_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/" 
