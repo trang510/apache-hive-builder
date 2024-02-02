@@ -79,7 +79,7 @@ clean_unused_files() {
       clean_unused_files $target/$jf 1;
     else
       cleaned=0
-      echo "---cleaning file" ${$target/$jf}
+      echo "---cleaning file" $target/$jf
       for pom in $(jar tvf $target/$jf|grep -E "pom.(xml|properties)$"|awk -F" " '{print $8}');
       do
         zip -d $target/$jf $pom
