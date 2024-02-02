@@ -33,7 +33,7 @@ remove_libs() {
     for jf in $(ls $target)
     do
       if [[ -d $target/$jf ]]; then
-        continue
+        remove_libs $target/$jf
       else
         if [[ "$jf" == "$line" ]]; then
           echo "Removing jar $target/$jf"
@@ -75,30 +75,67 @@ clean_unused_files() {
       continue
     fi
 
-    cleaned=0
-    for pom in $(jar tvf $target/$jf|grep -E "pom.(xml|properties)$"|awk -F" " '{print $8}');
-    do
-      zip -d $target/$jf $pom
-      cleaned=1
-    done;
-    if [[ $cleaned -eq 1 ]] || [[ $jf =~ ^[a-z]+.*$ ]];
-    then
-      ok=1
-      echo $(date) $jf > RELEASE
-      zip -u $target/$jf RELEASE
-      if [[ "$mode" == "1" ]]; then
-        mv $target/$jf $target/lib-$n.jar
+    if [[ -d $target/$jf ]]; then
+      clean_unused_files $target/$jf 1;
+    else
+      cleaned=0
+      for pom in $(jar tvf $target/$jf|grep -E "pom.(xml|properties)$"|awk -F" " '{print $8}');
+      do
+        zip -d $target/$jf $pom
+        cleaned=1
+      done;
+      if [[ $cleaned -eq 1 ]] || [[ $jf =~ ^[a-z]+.*$ ]];
+      then
+        ok=1
+        echo $(date) $jf > RELEASE
+        zip -u $target/$jf RELEASE
+        if [[ "$mode" == "1" ]]; then
+          mv $target/$jf $target/lib-$n.jar
+        fi;
       fi;
     fi;
     n=$((n+1))
   done;
 }
 
-#for fd in hcatalog/share/webhcat hcatalog/share/webhcat/svr/lib jdbc lib hcatalog/share/webhcat/java-client;
-#do
-#  clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd} 0
-#  # echo .
-#done;
+clean_unused_files_v2() {
+  local target=$1
+  local resname=$2
+  local filter=$3
+  if [[ "$resname" == "" ]]; then
+    resname="pom.(xml|properties)$"
+  fi;
+  local n=0
+  local cleaned=0
+  for jf in $(ls $target);
+  do
+    echo $jf $filter
+    if [[ "$filter" == "" ]] || [[ $jf =~ $filter ]]; then
+      cleaned=0
+      for pom in $(jar tvf $target/$jf|grep -E ${resname}|awk -F" " '{print $8}');
+      do
+        zip -d $target/$jf $pom
+        cleaned=1
+      done;
+      if [[ $cleaned -eq 1 ]] || [[ $jf =~ ^[a-z]+.*$ ]];
+      then
+        ok=1
+        echo $(date) $jf > RELEASE
+        zip -u $target/$jf RELEASE
+        if [[ "$mode" == "1" ]]; then
+          mv $target/$jf $target/lib-$n.jar
+        fi;
+      fi;
+      n=$((n+1))
+    fi;
+  done;
+}
+
+for fd in hcatalog/share/webhcat hcatalog/share/webhcat/svr/lib jdbc lib hcatalog/share/webhcat/java-client;
+do
+  clean_unused_files /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/${fd} 0
+  # echo .
+done;
 
 for fd in share/hadoop/tools/sources share/hadoop/yarn/sources share/hadoop/hdfs/sources share/hadoop/mapreduce/sources;
 do
@@ -107,28 +144,23 @@ done;
 
 rm -rf /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/hadoop-yarn-applications-catalog-webapp-*.war
 
-#for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
-#do
-#  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 0
-#  # echo .
-#done;
+for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
+do
+  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 0
+  # echo .
+done;
+
+extra_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/"
+extra_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/"
+extra_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/common/lib/"
 
 remove_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/"
 remove_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/jdbc/"
 remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/csi/lib/"
 remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/timelineservice/lib/"
-#rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/timelineservice/lib/htrace-core-3.1.0-incubating.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/velocity-1.7.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/calcite-core-1.16.0.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/calcite-druid-1.16.0.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/avro-1.8.2.jar
-#rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/common/lib/avro-1.7.7.jar
-#rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/avro-1.7.7.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/hbase-server-2.0.0-alpha4.jar
-#rm /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/csi/lib/protobuf-java-3.7.1.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/netty-3.10.5.Final.jar
-#rm /opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/netty-3.10.6.Final.jar
+remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/"
+remove_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/common/lib/"
 
-extra_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/" 
-extra_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/" 
-extra_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/common/lib/"
+clean_unused_files_v2 "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/" "jquery.*.js$" "scala-compiler.*.jar"
+clean_unused_files_v2 "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/" "jquery.*.js$" "spark-core_.*.jar"
+clean_unused_files_v2 "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/" "jquery.*.js$" "hive-llap-server.*.jar"
