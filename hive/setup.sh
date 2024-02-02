@@ -79,6 +79,7 @@ clean_unused_files() {
       clean_unused_files $target/$jf 1;
     else
       cleaned=0
+      echo "---cleaning file" ${$target/$jf}
       for pom in $(jar tvf $target/$jf|grep -E "pom.(xml|properties)$"|awk -F" " '{print $8}');
       do
         zip -d $target/$jf $pom
@@ -144,11 +145,11 @@ done;
 
 rm -rf /opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/yarn/hadoop-yarn-applications-catalog-webapp-*.war
 
-#for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
-#do
-#  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 0
-#  # echo .
-#done;
+for fd in share/hadoop/tools/lib share/hadoop/yarn share/hadoop/yarn/csi share/hadoop/yarn/csi/lib share/hadoop/yarn/timelineservice share/hadoop/yarn/lib share/hadoop/common/lib share/hadoop/hdfs/lib share/hadoop/mapreduce share/hadoop/client
+do
+  clean_unused_files /opt/app/hadoop-${HADOOP_BIN_VERSION}/${fd} 0
+  # echo .
+done;
 
 extra_libs "/opt/app/apache-hive-${HIVE_BIN_VERSION}-bin/lib/"
 extra_libs "/opt/app/hadoop-${HADOOP_BIN_VERSION}/share/hadoop/hdfs/lib/"
